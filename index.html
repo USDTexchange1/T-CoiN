@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>T-CoiN Wallet</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#020617,#0f172a,#020617);
+color:white;
+min-height:100vh;
+overflow-x:hidden;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px;
+background:#020617;
+position:fixed;
+width:100%;
+top:0;
+z-index:100;
+box-shadow:0 0 20px rgba(0,0,0,.6);
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+letter-spacing:1px;
+}
+
+.container{
+padding-top:90px;
+max-width:900px;
+margin:auto;
+padding-left:20px;
+padding-right:20px;
+}
+
+.hidden{
+display:none;
+}
+
+.hero{
+text-align:center;
+padding:70px 20px;
+animation:fadeIn 1s;
+}
+
+.hero h1{
+font-size:52px;
+margin-bottom:20px;
+}
+
+.hero p{
+opacity:.8;
+margin-bottom:30px;
+font-size:18px;
+}
+
+button{
+padding:14px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#3b82f6;
+color:white;
+margin:5px;
+font-size:15px;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 10px #3b82f6;
+}
+
+.secondary{
+background:#1e293b;
+}
+
+input{
+width:100%;
+padding:14px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#0f172a;
+color:white;
+}
+
+.auth{
+max-width:420px;
+margin:auto;
+animation:fadeIn .5s;
+}
+
+.card{
+background:#1e293b;
+padding:25px;
+border-radius:16px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.6);
+animation:fadeIn .5s;
+}
+
+.wallet-card{
+text-align:center;
+}
+
+.wallet-card h1{
+font-size:42px;
+margin-top:10px;
+transition:.3s;
+}
+
+.actions{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:12px;
+margin-bottom:20px;
+}
+
+.actions button{
+background:#0f172a;
+}
+
+.features{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+margin-top:40px;
+}
+
+.feature{
+background:#1e293b;
+padding:25px;
+border-radius:14px;
+text-align:center;
+font-size:16px;
+transition:.3s;
+}
+
+.feature i{
+font-size:28px;
+margin-bottom:10px;
+color:#3b82f6;
+}
+
+.feature:hover{
+transform:translateY(-5px);
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.8);
+display:flex;
+align-items:center;
+justify-content:center;
+animation:fadeIn .3s;
+}
+
+.modal-box{
+background:#1e293b;
+padding:30px;
+border-radius:16px;
+width:90%;
+max-width:420px;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,.8);
+}
+
+.toast{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#3b82f6;
+padding:15px 20px;
+border-radius:8px;
+opacity:0;
+transform:translateY(20px);
+transition:.4s;
+}
+
+.toast.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.history-item{
+background:#1e293b;
+padding:14px;
+border-radius:10px;
+margin-bottom:10px;
+font-size:14px;
+}
+
+.qr{
+background:white;
+padding:10px;
+display:inline-block;
+margin-top:10px;
+border-radius:8px;
+}
+
+.loader{
+border:4px solid #1e293b;
+border-top:4px solid #3b82f6;
+border-radius:50%;
+width:30px;
+height:30px;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">T-CoiN</div>
+
+<div id="navButtons">
+<button onclick="showLogin()">Iniciar sesión</button>
+<button onclick="showRegister()">Crear cuenta</button>
+</div>
+
+</header>
+
+<div class="container">
+
+<div id="landing">
+
+<div class="hero">
+
+<h1>T-CoiN</h1>
+
+<p>Plataforma digital para enviar y recibir pagos de forma rápida y segura</p>
+
+<button onclick="showRegister()">Crear cuenta</button>
+<button onclick="showLogin()" class="secondary">Iniciar sesión</button>
+
+</div>
+
+<div class="features">
+
+<div class="feature">
+<i class="fa-solid fa-paper-plane"></i>
+<br>Enviar dinero
+</div>
+
+<div class="feature">
+<i class="fa-solid fa-wallet"></i>
+<br>Recibir pagos
+</div>
+
+<div class="feature">
+<i class="fa-solid fa-qrcode"></i>
+<br>Pagar con QR
+</div>
+
+<div class="feature">
+<i class="fa-solid fa-clock-rotate-left"></i>
+<br>Historial
+</div>
+
+</div>
+
+</div>
+
+<div id="register" class="hidden auth">
+
+<h2>Crear cuenta</h2>
+
+<input id="rName" placeholder="Nombre completo">
+<input id="rUser" placeholder="Usuario único">
+<input id="rPass" type="password" placeholder="Contraseña">
+
+<br><br>
+
+<button onclick="register()">Crear cuenta</button>
+
+</div>
+
+<div id="login" class="hidden auth">
+
+<h2>Iniciar sesión</h2>
+
+<input id="lUser" placeholder="Usuario">
+<input id="lPass" type="password" placeholder="Contraseña">
+
+<br><br>
+
+<button onclick="login()">Entrar</button>
+
+</div>
+
+<div id="dashboard" class="hidden">
+
+<div class="card wallet-card">
+
+<h2 id="welcome"></h2>
+<h1 id="balance"></h1>
+
+</div>
+
+<div class="actions">
+
+<button onclick="openSend()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+<button onclick="openReceive()"><i class="fa-solid fa-wallet"></i> Recibir</button>
+<button onclick="openQR()"><i class="fa-solid fa-qrcode"></i> Generar QR</button>
+<button onclick="scanQR()"><i class="fa-solid fa-camera"></i> Escanear QR</button>
+<button onclick="showHistory()"><i class="fa-solid fa-clock"></i> Historial</button>
+<button onclick="profile()"><i class="fa-solid fa-user"></i> Perfil</button>
+<button onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+
+</div>
+
+<div id="historyList"></div>
+
+</div>
+
+</div>
+
+<div id="modal" class="hidden modal"></div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+modal.onclick=e=>{
+if(e.target.id==="modal") closeModal()
+}
+
+function toast(msg){
+let t=document.getElementById("toast")
+t.innerText=msg
+t.classList.add("show")
+setTimeout(()=>t.classList.remove("show"),3000)
+}
+
+function show(id){
+["landing","login","register","dashboard"].forEach(x=>{
+document.getElementById(x).classList.add("hidden")
+})
+document.getElementById(id).classList.remove("hidden")
+}
+
+function showLogin(){show("login")}
+function showRegister(){show("register")}
+
+function register(){
+
+let name=rName.value
+let user=rUser.value
+let pass=rPass.value
+
+if(!name||!user||!pass){
+toast("Completa todos los campos")
+return
+}
+
+if(pass.length<4){
+toast("La contraseña debe tener al menos 4 caracteres")
+return
+}
+
+let users=JSON.parse(localStorage.getItem("users"))||[]
+
+if(users.find(u=>u.usuario===user)){
+toast("Usuario ocupado")
+return
+}
+
+let newUser={
+nombre:name,
+usuario:user,
+password:pass,
+saldo:1000,
+historial:[]
+}
+
+users.push(newUser)
+
+localStorage.setItem("users",JSON.stringify(users))
+
+toast("Cuenta creada")
+
+showLogin()
+
+}
+
+function login(){
+
+let user=lUser.value
+let pass=lPass.value
+
+let users=JSON.parse(localStorage.getItem("users"))||[]
+
+let found=users.find(u=>u.usuario===user)
+
+if(!found){
+toast("Usuario no registrado")
+return
+}
+
+if(found.password!==pass){
+toast("Contraseña incorrecta")
+return
+}
+
+localStorage.setItem("currentUser",user)
+
+loadDashboard()
+
+}
+
+function loadDashboard(){
+
+let user=localStorage.getItem("currentUser")
+
+if(!user){
+show("landing")
+return
+}
+
+document.getElementById("navButtons").style.display="none"
+
+let users=JSON.parse(localStorage.getItem("users"))
+
+let u=users.find(x=>x.usuario===user)
+
+welcome.innerText="Hola "+u.nombre
+balance.innerText=u.saldo+" TCN"
+
+balance.style.transform="scale(1.1)"
+setTimeout(()=>balance.style.transform="scale(1)",200)
+
+show("dashboard")
+
+}
+
+function logout(){
+
+localStorage.removeItem("currentUser")
+document.getElementById("navButtons").style.display="block"
+show("landing")
+
+}
+
+function transfer(to,amount){
+
+let users=JSON.parse(localStorage.getItem("users"))
+
+let senderName=localStorage.getItem("currentUser")
+
+if(to===senderName){
+toast("No puedes enviarte dinero a ti mismo")
+return
+}
+
+let sender=users.find(u=>u.usuario===senderName)
+let receiver=users.find(u=>u.usuario===to)
+
+if(!receiver){
+toast("Usuario no encontrado")
+return
+}
+
+if(isNaN(amount)||amount<=0){
+toast("Monto inválido")
+return
+}
+
+if(sender.saldo<amount){
+toast("Saldo insuficiente")
+return
+}
+
+sender.saldo-=amount
+receiver.saldo+=amount
+
+let date=new Date().toLocaleString()
+
+sender.historial.unshift({tipo:"enviado",monto:amount,usuarioRelacionado:to,fecha:date})
+receiver.historial.unshift({tipo:"recibido",monto:amount,usuarioRelacionado:senderName,fecha:date})
+
+localStorage.setItem("users",JSON.stringify(users))
+
+toast("Pago enviado")
+
+loadDashboard()
+
+}
+
+function openSend(){
+
+modal.innerHTML=`<div class="modal-box">
+
+<h3>Enviar dinero</h3>
+
+<input id="toUser" placeholder="Usuario destino">
+<input id="toAmount" placeholder="Cantidad">
+
+<br><br>
+
+<button onclick="confirmSend()">Enviar</button>
+<button onclick="closeModal()">Cancelar</button>
+
+</div>`
+
+modal.classList.remove("hidden")
+
+}
+
+function confirmSend(){
+
+let to=toUser.value
+let amount=parseFloat(toAmount.value)
+
+closeModal()
+
+transfer(to,amount)
+
+}
+
+function openReceive(){
+
+let user=localStorage.getItem("currentUser")
+
+modal.innerHTML=`<div class="modal-box">
+
+<h3>Recibir dinero</h3>
+
+<p>ID: ${user}</p>
+
+<p>Comparte este QR para recibir pagos</p>
+
+<button onclick="copyID('${user}')">Copiar ID</button>
+
+<div id="qrReceive" class="qr"></div>
+
+</div>`
+
+modal.classList.remove("hidden")
+
+setTimeout(()=>{ new QRCode(document.getElementById("qrReceive"),user) },200)
+
+}
+
+function copyID(id){
+navigator.clipboard.writeText(id)
+toast("ID copiado")
+}
+
+function openQR(){
+
+let user=localStorage.getItem("currentUser")
+
+modal.innerHTML=`<div class="modal-box">
+
+<h3>Generar QR de cobro</h3>
+
+<input id="qrAmount" placeholder="Cantidad">
+
+<br><br>
+
+<button onclick="makeQR('${user}')">Generar</button>
+
+<p id="qrText"></p>
+
+<div id="qrCode" class="qr"></div>
+
+<button onclick="copyQR()">Copiar código</button>
+
+</div>`
+
+modal.classList.remove("hidden")
+
+}
+
+function makeQR(user){
+
+let amount=qrAmount.value
+let code=user+":"+amount
+
+document.getElementById("qrCode").innerHTML=""
+document.getElementById("qrText").innerText=code
+
+new QRCode(document.getElementById("qrCode"),code)
+
+}
+
+function copyQR(){
+navigator.clipboard.writeText(document.getElementById("qrText").innerText)
+toast("Código copiado")
+}
+
+function scanQR(){
+
+modal.innerHTML=`<div class="modal-box">
+
+<h3>Pegar código QR</h3>
+
+<input id="scanCode">
+
+<br><br>
+
+<button onclick="processQR()">Confirmar</button>
+
+</div>`
+
+modal.classList.remove("hidden")
+
+}
+
+function processQR(){
+
+let code=scanCode.value
+
+if(!code.includes(":")){
+toast("QR inválido")
+return
+}
+
+let parts=code.split(":")
+let user=parts[0]
+let amount=parseFloat(parts[1])
+
+closeModal()
+
+if(confirm("Enviar "+amount+" TCN a "+user+" ?")){
+transfer(user,amount)
+}
+
+}
+
+function showHistory(){
+
+let users=JSON.parse(localStorage.getItem("users"))
+let user=localStorage.getItem("currentUser")
+let u=users.find(x=>x.usuario===user)
+
+let list=document.getElementById("historyList")
+list.innerHTML=""
+
+if(u.historial.length===0){
+list.innerHTML="<p>No hay transacciones aún</p>"
+return
+}
+
+u.historial.forEach(t=>{
+
+let div=document.createElement("div")
+div.className="history-item"
+
+div.innerHTML=`<b>${t.tipo}</b> ${t.monto} TCN con <b>${t.usuarioRelacionado}</b><br>${t.fecha}`
+
+list.appendChild(div)
+
+})
+
+}
+
+function profile(){
+
+let users=JSON.parse(localStorage.getItem("users"))
+let user=localStorage.getItem("currentUser")
+let u=users.find(x=>x.usuario===user)
+
+modal.innerHTML=`<div class="modal-box">
+
+<h3>Perfil</h3>
+
+<p>Nombre: ${u.nombre}</p>
+<p>Usuario: ${u.usuario}</p>
+
+<button onclick="logout()">Cerrar sesión</button>
+
+</div>`
+
+modal.classList.remove("hidden")
+
+}
+
+function closeModal(){
+modal.classList.add("hidden")
+}
+
+loadDashboard()
+
+</script>
+
+</body>
+</html>
